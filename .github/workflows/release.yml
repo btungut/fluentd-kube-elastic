@@ -1,0 +1,29 @@
+name: Draft Release
+
+on:
+  push:
+    tags:
+      - "v*"
+      
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+
+      - id: checkout
+        uses: actions/checkout@v3
+
+      - uses: azure/setup-helm@v3
+
+      - name: "Helm package"
+        run: |
+          helm dep update .
+          helm package .
+        working-directory: chart
+
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: chart/*.tgz
+          draft: true
+          fail_on_unmatched_files: true

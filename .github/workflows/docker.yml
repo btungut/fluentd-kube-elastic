@@ -1,0 +1,42 @@
+name: Docker Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      dockerTagRevision:
+        description: "docker tag revision / postfix"
+        required: true
+        type: string
+      
+jobs:
+  build_and_push:
+    runs-on: ubuntu-latest
+    steps:
+
+      - id: checkout
+        uses: actions/checkout@v3
+
+      - name: "Prepare variables"
+        run: |
+          set -euo pipefail
+
+          line=`cat Dockerfile | grep "FROM fluent/fluentd"`
+          BASE_IMAGE_TAG=`echo $line | sed 's/v//' | cut -d ":" -f2`
+          DOCKER_TAG="${BASE_IMAGE_TAG}-${DOCKER_TAG_REVISION}"
+          echo "DOCKER_TAG = $DOCKER_TAG"
+          echo "DOCKER_TAG=$DOCKER_TAG" >> $GITHUB_ENV
+        env:
+          DOCKER_TAG_REVISION: ${{ inputs.dockerTagRevision }}
+
+      - id: docker_login
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - id: docker_build_and_push
+        uses: docker/build-push-action@v3
+        with:
+          push: true
+          context: "./"
+          tags: btungut/fluentd-kube-elastic:${{ env.DOCKER_TAG }}

@@ -1,0 +1,86 @@
+{
+    "template": {
+      "mappings": {
+        "dynamic": true,
+        "numeric_detection": false,
+        "date_detection": true,
+        "dynamic_date_formats": [
+          "strict_date_optional_time",
+          "yyyy/MM/dd HH:mm:ss Z||yyyy/MM/dd Z"
+        ],
+        "_source": {
+          "enabled": true,
+          "includes": [],
+          "excludes": []
+        },
+        "_routing": {
+          "required": false
+        },
+        "dynamic_templates": [{
+            "log_msg_string_fields": {
+              "match_pattern": "regex",
+              "match": "^.*(m|msg|message|x|ex|exception|err|error|details|stacktrace)$",
+              "match_mapping_type": "string",
+              "mapping": {
+                "type": "text",
+                "fields": {
+                  "keyword": {
+                    "type": "keyword",
+                    "ignore_above": 256
+                  }
+                }
+              }
+            }
+          },
+          {
+            "kubernetes_string_fields": {
+              "path_match": "kubernetes.*",
+              "match_mapping_type": "string",
+              "mapping": {
+                "type": "text",
+                "fields": {
+                  "keyword": {
+                    "type": "keyword",
+                    "ignore_above": 256
+                  }
+                }
+              }
+            }
+          },
+          {
+            "other_string_fields": {
+              "match": "*",
+              "match_mapping_type": "string",
+              "mapping": {
+                "norms": false,
+                "type": "keyword"
+              }
+            }
+          }
+        ],
+        "properties": {
+          "@timestamp": {
+            "type": "date_nanos"
+          },
+          "stream": {
+            "type": "keyword"
+          },
+          "log": {
+            "type": "text",
+            "fields": {
+              "keyword": {
+                "type": "keyword",
+                "ignore_above": 256
+              }
+            }
+          },
+          "obj": {
+            "type": "object"
+          }
+        }
+      }
+    },
+    "index_patterns": [
+      "{{ .Values.conf.elasticsearch.indexPrefix }}-*"
+    ]
+  }

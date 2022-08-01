@@ -1,0 +1,128 @@
+nameOverride: ""
+fullnameOverride: ""
+
+# -- Workload type. Deployment or DaemonSet
+kind: DaemonSet
+
+image:
+  repository: "btungut/fluentd-kube-elastic"
+  tag: ""
+  pullSecrets: []
+
+# -- Limit and requests for fluentd container. Please fine-tune these values based on your architecture.
+resources:
+  limits:
+    cpu: 500m
+    memory: 512Mi
+  requests:
+    cpu: 100m
+    memory: 128Mi
+
+conf:
+  enabled: true
+
+  # -- It enables stdout instead elasticsearch
+  debug: false
+
+  # -- Fluentd log level
+  logLevel: warn # https://docs.fluentd.org/deployment/logging#log-level
+
+  # -- Excluded log files
+  exclude:
+    - "/var/log/containers/*fluentd*"
+    - "/var/log/containers/*kube-system*"
+    - "/var/log/containers/*cattle*"
+
+  # -- Multiline regex pattern for identifing the multiline log records
+  # -- Case1: Log entry starts with yyyy-MM-dd hh:mm:ss   OR
+  # -- Case2: Log entry includes log level (severity) like trace, info, etc.
+  multilinePattern: ^((\d{4})-(\d{2})-(\d{2})(T| )(\d{2})\:(\d{2})\:(\d{2}))|(\[(?i)(trace|tra|trc|debug|dbg|deb|information|info|inf|warning|warn|wrn|error|err|fatal|fat|ftl|critical|crit|crt|emergency|emerg|emr|emg|emrg)\])
+
+  # -- To be removed fields
+  removedFields:
+    - time
+    - logtag
+    - $.kubernetes.labels.pod-template-hash
+    - $.kubernetes.labels.rollouts-pod-template-hash
+    - $.docker
+    - $.kubernetes.container_image_id
+    - $.kubernetes.pod_id
+    - $.kubernetes.pod_ip
+    - $.kubernetes.namespace_id
+    - $.kubernetes.namespace_labels
+
+  prometheus:
+    enabled: true
+    totalRecordsByImage: true
+    totalRecordsByNamespace: true
+
+  elasticsearch:
+    host: ""
+    port: "9200"
+    scheme: "http"
+    importIndexTemplate: true
+
+    # -- username and password for elasticsearch. IT IS RECOMENDED to use 'passwordSecret' field with kubernetes secret instead of providing credentials as plain-text
+    user: "elastic"
+    password: ""
+
+    # -- If filled, password for elasticsearch will be fetched from given kubernetes secret.
+    # -- This secret must have a field with name ELASTICSEARCH_PASSWORD
+    passwordSecret: ""
+
+    # -- If elasticsearch is communicating with TLS, a kubernetes secret that includes 'ca.crt', 'tls.crt', and 'tls.key' must be provided.
+    tlsSecret: ""
+
+    indexPrefix: "apps"
+    additionalOptions: |
+      @log_level info
+      reload_on_failure true
+      verify_es_version_at_startup false
+      default_elasticsearch_version 8
+
+      <buffer>
+        flush_mode interval
+        flush_interval 15s
+        flush_thread_count 2
+        flush_at_shutdown true
+
+        chunk_limit_size 8m
+        total_limit_size 256MB
+
+        retry_forever false
+        retry_type periodic
+        retry_wait 10
+        retry_max_times 60
+      </buffer>
+
+
+# -- conf.enabled:false must be set in order to use customized conf files declared below
+confFiles:
+  01-input.conf: |
+    example
+
+service:
+  type: ClusterIP
+  loadBalancerIP: ""
+  externalTrafficPolicy: ""
+  annotations: {}
+  ports: []
+
+env: {}
+envFrom: {}
+
+rbac:
+  enabled: true
+  serviceAccount:
+    name: ""
+    annotations: {}
+
+terminationGracePeriodSeconds: 30
+lifecycle: {}
+annotations: {}
+securityContext: {}
+podAnnotations: {}
+podSecurityContext: {}
+nodeSelector: {}
+tolerations: []
+affinity: {}

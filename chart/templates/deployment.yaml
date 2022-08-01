@@ -1,0 +1,25 @@
+{{- if eq (lower .Values.kind) "deployment" }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "fluentd-kube-elastic.fullname" . }}
+  labels:
+    {{- include "fluentd-kube-elastic.labels" . | nindent 4 }}
+  {{- with .Values.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      {{- include "fluentd-kube-elastic.podSelectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      annotations:
+        {{- include "fluentd-kube-elastic.podAnnotations" . | nindent 8 }}
+      labels:
+        {{- include "fluentd-kube-elastic.podSelectorLabels" . | nindent 8 }}
+    spec:
+      {{- include "fluentd-kube-elastic.podSpec" . | nindent 6 }}
+{{- end }}

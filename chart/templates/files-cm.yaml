@@ -1,0 +1,14 @@
+{{ $currentScope := .}}
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: {{ include "fluentd-kube-elastic.files-cm" . }}
+  labels:
+    {{- include "fluentd-kube-elastic.labels" . | nindent 4 }}
+data:
+{{ range $path, $_ :=  .Files.Glob  "files/**" }}
+  {{- with $currentScope}}
+  {{ base $path }}: |
+    {{- tpl (.Files.Get $path) . | nindent 4 }}
+  {{- end }}
+{{ end }}
