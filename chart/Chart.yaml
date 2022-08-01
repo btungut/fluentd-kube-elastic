@@ -4,3 +4,21 @@ description: Best fluentd implementation for collecting container logs from Kube
 type: application
 version: 1.15.1
 appVersion: "1.15-1-rev1"
+keywords:
+  - fluentd
+  - container logs
+  - kubernetes logs
+  - elasticsearch
+home: "https://github.com/btungut/fluentd-kube-elastic"
+sources:
+  - "https://github.com/btungut/fluentd-kube-elastic"
+maintainers:
+  - name: "Burak Tungut"
+    email: "burak.tungut@microsoft.com"
+
+annotations:
+  artifacthub.io/containsSecurityUpdates: "false"
+  artifacthub.io/license: MIT
+  artifacthub.io/links: |
+    - name: GitHub
+      url: https://github.com/btungut/fluentd-kube-elastic
