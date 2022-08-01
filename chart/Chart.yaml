@@ -2,5 +2,5 @@ apiVersion: v2
 name: fluentd-kube-elastic
 description: Best fluentd implementation for collecting container logs from Kubernetes
 type: application
-version: 0.0.0
-appVersion: ""
+version: 1.15.1
+appVersion: "1.15-1-rev1"

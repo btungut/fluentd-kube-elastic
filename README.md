@@ -1,5 +1,5 @@
 [![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/btungut)](https://artifacthub.io/packages/helm/btungut/fluentd-kube-elastic)
-[![Release](https://img.shields.io/github/v/release/btungut/fluentd-kube-elastic?include_prereleases&style=plastic)](https://github.com/btungut/fluentd-kube-elastic/releases/tag/v1.15.0)
+[![Release](https://img.shields.io/github/v/release/btungut/fluentd-kube-elastic?include_prereleases&style=plastic)](https://github.com/btungut/fluentd-kube-elastic/releases/tag/v1.15.1)
 [![LICENSE](https://img.shields.io/github/license/btungut/fluentd-kube-elastic?style=plastic)](https://github.com/btungut/fluentd-kube-elastic/blob/master/LICENSE)
 
 # Fluentd Kube Elastic

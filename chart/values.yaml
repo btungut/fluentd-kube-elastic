@@ -6,7 +6,7 @@ kind: DaemonSet
 
 image:
   repository: "btungut/fluentd-kube-elastic"
-  tag: ""
+  tag: "1.15-1-rev1"
   pullSecrets: []
 
 # -- Limit and requests for fluentd container. Please fine-tune these values based on your architecture.
