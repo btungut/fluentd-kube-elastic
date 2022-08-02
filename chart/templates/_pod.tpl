@@ -53,28 +53,18 @@ containers:
     lifecycle:
       {{- toYaml . | nindent 6 }}
     {{- end }}
+    {{- with .Values.startupProbe }}
     startupProbe:
-      httpGet:
-        path: /metrics
-        port: metrics
-      initialDelaySeconds: 5
-      periodSeconds: 5
-      timeoutSeconds: 3
-      failureThreshold: 10
+      {{- toYaml . | nindent 6 }}
+    {{- end }}
+    {{- with .Values.livenessProbe }}
     livenessProbe:
-      httpGet:
-        path: /metrics
-        port: metrics
-      periodSeconds: 30
-      timeoutSeconds: 5
-      failureThreshold: 3
+      {{- toYaml . | nindent 6 }}
+    {{- end }}
+    {{- with .Values.readinessProbe }}
     readinessProbe:
-      httpGet:
-        path: /metrics
-        port: metrics
-      periodSeconds: 30
-      timeoutSeconds: 5
-      failureThreshold: 3
+      {{- toYaml . | nindent 6 }}
+    {{- end }}
     volumeMounts:
       - name: fluentd-cm
         mountPath: "/fluentd/etc"
