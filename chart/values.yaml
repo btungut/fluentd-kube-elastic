@@ -52,7 +52,7 @@ conf:
     - $.kubernetes.namespace_labels
 
   prometheus:
-    enabled: true
+    enabled: false
     totalRecordsByImage: true
     totalRecordsByNamespace: true
 
@@ -102,30 +102,9 @@ confFiles:
   01-input.conf: |
     example
 
-startupProbe:
-  httpGet:
-    path: /metrics
-    port: metrics
-  initialDelaySeconds: 5
-  periodSeconds: 5
-  timeoutSeconds: 3
-  failureThreshold: 10
-
-livenessProbe:
-  httpGet:
-    path: /metrics
-    port: metrics
-  periodSeconds: 30
-  timeoutSeconds: 5
-  failureThreshold: 3
-
-readinessProbe:
-  httpGet:
-    path: /metrics
-    port: metrics
-  periodSeconds: 30
-  timeoutSeconds: 5
-  failureThreshold: 3
+startupProbe: {}
+livenessProbe: {}
+readinessProbe: {}
 
 service:
   type: ClusterIP
