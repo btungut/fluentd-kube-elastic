@@ -60,6 +60,7 @@ conf:
     host: ""
     port: "9200"
     scheme: "http"
+    path: ""
     importIndexTemplate: true
 
     # -- username and password for elasticsearch. IT IS RECOMENDED to use 'passwordSecret' field with kubernetes secret instead of providing credentials as plain-text
