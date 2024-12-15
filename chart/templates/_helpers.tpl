@@ -72,3 +72,9 @@ Create the name of the service account to use
 {{- define "fluentd-kube-elastic.elasticsearch-secret" -}}
 {{- include "fluentd-kube-elastic.fullname" . }}-elasticsearch
 {{- end }}
+
+{{- define "toExcludePaths" -}}
+{{- range $index, $value := . -}}
+{{- if $index}}, {{- end }}"/var/log/containers/{{$value}}"
+{{- end -}}
+{{- end -}}
