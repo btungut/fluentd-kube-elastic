@@ -29,8 +29,9 @@ conf:
   # -- Case2: Log entry includes log level (severity) like trace, info, etc.
   multilinePattern: ^((\d{4})-(\d{2})-(\d{2})(T| )(\d{2})\:(\d{2})\:(\d{2}))|(\[(?i)(trace|tra|trc|debug|dbg|deb|information|info|inf|warning|warn|wrn|error|err|fatal|fat|ftl|critical|crit|crt|emergency|emerg|emr|emg|emrg)\])
 
-  # Replace the dots with underscore for k8s events
-  replaceDotsWithUnderscore: true
+  # Replace the dots with underscore for k8s events. E.g.: kubernetes.labels.app.kubernetes.io/instance --> kubernetes.labels.app_kubernetes_io/instance
+  # Attention: It can consume more CPU, if it is enabled!
+  replaceDotsWithUnderscore: false
 
   # Ignore the log records that produced by the following containers and namespaces (case-insensitive and regex supported)
   ignoredContainersAndNamespaces: []
