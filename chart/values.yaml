@@ -14,9 +14,6 @@ resources:
   limits:
     cpu: 500m
     memory: 512Mi
-  requests:
-    cpu: 100m
-    memory: 128Mi
 
 conf:
   enabled: true
@@ -31,6 +28,9 @@ conf:
   # -- Case1: Log entry starts with yyyy-MM-dd hh:mm:ss   OR
   # -- Case2: Log entry includes log level (severity) like trace, info, etc.
   multilinePattern: ^((\d{4})-(\d{2})-(\d{2})(T| )(\d{2})\:(\d{2})\:(\d{2}))|(\[(?i)(trace|tra|trc|debug|dbg|deb|information|info|inf|warning|warn|wrn|error|err|fatal|fat|ftl|critical|crit|crt|emergency|emerg|emr|emg|emrg)\])
+
+  # Replace the dots with underscore for k8s events
+  replaceDotsWithUnderscore: true
 
   # Ignore the log records that produced by the following containers and namespaces (case-insensitive and regex supported)
   ignoredContainersAndNamespaces: []
@@ -104,11 +104,11 @@ conf:
         flush_at_shutdown true
 
         chunk_limit_size 8m
-        total_limit_size 256MB
+        total_limit_size 128MB
 
         retry_forever false
         retry_type periodic
-        retry_wait 10
+        retry_wait 5
         retry_max_times 60
       </buffer>
 
