@@ -88,16 +88,6 @@
                 }
               }
             }
-          },
-          {
-            "other_string_fields": {
-              "match": "*",
-              "match_mapping_type": "string",
-              "mapping": {
-                "norms": false,
-                "type": "keyword"
-              }
-            }
           }
         ],
         "properties": {
