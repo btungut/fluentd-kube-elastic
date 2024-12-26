@@ -16,7 +16,64 @@
         "_routing": {
           "required": false
         },
-        "dynamic_templates": [{
+        "dynamic_templates": [
+          {
+            "obj_string_fields": {
+              "path_match": [
+                "obj.*",
+                "@obj.*",
+                "object.*",
+                "@object.*",
+                "data.*",
+                "@data.*"
+              ],
+              "match_mapping_type": "string",
+              "mapping": {
+                "type": "text",
+                "fields": {
+                  "keyword": {
+                    "type": "keyword",
+                    "ignore_above": 64
+                  }
+                }
+              }
+            }
+          },
+          {
+            "kubernetes_string_fields": {
+              "path_match": [
+                "kubernetes.*",
+                "docker.*"
+              ],
+              "match_mapping_type": "string",
+              "mapping": {
+                "type": "text",
+                "fields": {
+                  "keyword": {
+                    "type": "keyword",
+                    "ignore_above": 64
+                  }
+                }
+              }
+            }
+          },
+          {
+            "http_fields": {
+              "match_pattern": "regex",
+              "match": "(http.*|headers.*)",
+              "match_mapping_type": "string",
+              "mapping": {
+                "type": "text",
+                "fields": {
+                  "keyword": {
+                    "type": "keyword",
+                    "ignore_above": 64
+                  }
+                }
+              }
+            }
+          },
+          {
             "log_msg_string_fields": {
               "match_pattern": "regex",
               "match": "^.*(m|msg|message|x|ex|exception|err|error|details|stacktrace)$",
@@ -26,22 +83,7 @@
                 "fields": {
                   "keyword": {
                     "type": "keyword",
-                    "ignore_above": 256
-                  }
-                }
-              }
-            }
-          },
-          {
-            "kubernetes_string_fields": {
-              "path_match": "kubernetes.*",
-              "match_mapping_type": "string",
-              "mapping": {
-                "type": "text",
-                "fields": {
-                  "keyword": {
-                    "type": "keyword",
-                    "ignore_above": 256
+                    "ignore_above": 512
                   }
                 }
               }
@@ -64,15 +106,6 @@
           },
           "stream": {
             "type": "keyword"
-          },
-          "log": {
-            "type": "text",
-            "fields": {
-              "keyword": {
-                "type": "keyword",
-                "ignore_above": 256
-              }
-            }
           },
           "obj": {
             "type": "object"
