@@ -48,18 +48,9 @@ conf:
     # - "/liveness"
     # - "/startup"
 
-  # -- To be removed fields
-  removedFields:
-    - time
-    - logtag
-    - $.kubernetes.labels.pod-template-hash
-    - $.kubernetes.labels.rollouts-pod-template-hash
-    - $.docker
-    - $.kubernetes.container_image_id
-    - $.kubernetes.pod_id
-    - $.kubernetes.pod_ip
-    - $.kubernetes.namespace_id
-    - $.kubernetes.namespace_labels
+  # Remove the fields from the log records
+  # ATTENTION: This array is being merged with the default array which is created for unnecessary k8s and docker fields. Please visit _overrides.tpl for more details!
+  removedFields: []
 
   prometheus:
     enabled: false
