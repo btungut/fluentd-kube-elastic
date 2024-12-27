@@ -6,7 +6,7 @@ kind: DaemonSet
 
 image:
   repository: "btungut/fluentd-kube-elastic"
-  tag: "1.15-1-rev1"
+  tag: "1.18-1-rev1"
   pullSecrets: []
 
 # -- Limit and requests for fluentd container. Please fine-tune these values based on your architecture.
@@ -14,9 +14,6 @@ resources:
   limits:
     cpu: 500m
     memory: 512Mi
-  requests:
-    cpu: 100m
-    memory: 128Mi
 
 conf:
   enabled: true
@@ -27,29 +24,33 @@ conf:
   # -- Fluentd log level
   logLevel: warn # https://docs.fluentd.org/deployment/logging#log-level
 
-  # -- Excluded log files
-  exclude:
-    - "/var/log/containers/*fluentd*"
-    - "/var/log/containers/*kube-system*"
-    - "/var/log/containers/*cattle*"
-
   # -- Multiline regex pattern for identifing the multiline log records
   # -- Case1: Log entry starts with yyyy-MM-dd hh:mm:ss   OR
   # -- Case2: Log entry includes log level (severity) like trace, info, etc.
   multilinePattern: ^((\d{4})-(\d{2})-(\d{2})(T| )(\d{2})\:(\d{2})\:(\d{2}))|(\[(?i)(trace|tra|trc|debug|dbg|deb|information|info|inf|warning|warn|wrn|error|err|fatal|fat|ftl|critical|crit|crt|emergency|emerg|emr|emg|emrg)\])
 
-  # -- To be removed fields
-  removedFields:
-    - time
-    - logtag
-    - $.kubernetes.labels.pod-template-hash
-    - $.kubernetes.labels.rollouts-pod-template-hash
-    - $.docker
-    - $.kubernetes.container_image_id
-    - $.kubernetes.pod_id
-    - $.kubernetes.pod_ip
-    - $.kubernetes.namespace_id
-    - $.kubernetes.namespace_labels
+  # Replace the dots with underscore for k8s events. E.g.: kubernetes.labels.app.kubernetes.io/instance --> kubernetes.labels.app_kubernetes_io/instance
+  # Attention: It can consume more CPU, if it is enabled!
+  replaceDotsWithUnderscore: false
+
+  # Ignore the log records that produced by the following containers and namespaces (case-insensitive and regex supported)
+  ignoredContainersAndNamespaces: []
+    # - "*fluentd*"
+    # - "*kube*"
+    # - "*cattle*"
+
+  # Ignore the log records that include the following words (case-insensitive and regex supported)
+  ignoredWords: []
+    # - "/probe"
+    # - "/health"
+    # - "/healthz"
+    # - "/readiness"
+    # - "/liveness"
+    # - "/startup"
+
+  # Remove the fields from the log records
+  # ATTENTION: This array is being merged with the default array which is created for unnecessary k8s and docker fields. Please visit _overrides.tpl for more details!
+  removedFields: []
 
   prometheus:
     enabled: false
@@ -63,16 +64,23 @@ conf:
     path: ""
     importIndexTemplate: true
 
-    # -- username and password for elasticsearch. IT IS RECOMENDED to use 'passwordSecret' field with kubernetes secret instead of providing credentials as plain-text
-    user: "elastic"
-    password: ""
+    auth:
+      # For anonymous access, set it to false
+      # -- If set to true, user and password OR passwordSecret fields must be filled!
+      enabled: false
 
-    # -- If filled, password for elasticsearch will be fetched from given kubernetes secret.
-    # -- This secret must have a field with name ELASTICSEARCH_PASSWORD
-    passwordSecret: ""
+      # -- username and password for elasticsearch. IT IS RECOMENDED to use 'passwordSecret' field with kubernetes secret instead of providing credentials as plain-text
+      user: "elastic"
+      password: ""
 
-    # -- If elasticsearch is communicating with TLS, a kubernetes secret that includes 'ca.crt', 'tls.crt', and 'tls.key' must be provided.
-    tlsSecret: ""
+      # -- If filled, password for elasticsearch will be fetched from the given kubernetes secret.
+      # -- The secret must be in the format: <secret-name> and must contain a field named ELASTICSEARCH_PASSWORD.
+      # -- This secret must have a field with name ELASTICSEARCH_PASSWORD and should be created in the same namespace as the deployment
+      passwordSecret: ""
+
+      # -- If elasticsearch is communicating with TLS, a kubernetes secret that includes 
+      # -- 'ca.crt', 'tls.crt', and 'tls.key' must be provided.
+      tlsSecret: ""
 
     indexPrefix: "apps"
     additionalOptions: |
@@ -88,19 +96,19 @@ conf:
         flush_at_shutdown true
 
         chunk_limit_size 8m
-        total_limit_size 256MB
+        total_limit_size 128MB
 
         retry_forever false
         retry_type periodic
-        retry_wait 10
+        retry_wait 5
         retry_max_times 60
       </buffer>
 
 
 # -- conf.enabled:false must be set in order to use customized conf files declared below
-confFiles:
-  01-input.conf: |
-    example
+confFiles: {}
+  # 01-input.conf: |
+  #   example
 
 startupProbe: {}
 livenessProbe: {}

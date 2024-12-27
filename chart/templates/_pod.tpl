@@ -37,9 +37,11 @@ containers:
     {{- with .Values.envFrom }}
       {{- toYaml .Values.envFrom | nindent 6 }}
     {{- end }}
+    {{- if .Values.conf.elasticsearch.auth.enabled }}
       - secretRef: 
-          name: {{ (.Values.conf.elasticsearch.passwordSecret) | default (include "fluentd-kube-elastic.elasticsearch-secret" .) }}
+          name: {{ (.Values.conf.elasticsearch.auth.passwordSecret) | default (include "fluentd-kube-elastic.elasticsearch-secret" .) }}
           optional: false
+    {{- end }}
     ports:
       - name: metrics
         containerPort: 24231
@@ -76,7 +78,7 @@ containers:
         mountPath: /var/log
       - name: varlibdockercontainers
         mountPath: /var/lib/docker/containers
-      {{- if .Values.conf.elasticsearch.tlsSecret }}
+      {{- if .Values.conf.elasticsearch.auth.tlsSecret }}
       - name: certs
         mountPath: "/fluentd/etc/certs"
       {{- end }}
@@ -104,10 +106,10 @@ volumes:
   - name: files-cm
     configMap:
       name: {{ include "fluentd-kube-elastic.files-cm" . }}
-  {{- if .Values.conf.elasticsearch.tlsSecret }}
+  {{- if .Values.conf.elasticsearch.auth.tlsSecret }}
   - name: certs
     secret:
-      secretName: {{ .Values.conf.elasticsearch.tlsSecret }}
+      secretName: {{ .Values.conf.elasticsearch.auth.tlsSecret }}
       optional: false
   {{- end }}
   - name: varlog
